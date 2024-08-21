@@ -24,20 +24,12 @@ export class AuthService {
   ) {}
 
   async signUp(createUserDto: CreateUserDto): Promise<{ token: string }> {
-    const { email, password } = createUserDto;
+    const { email } = createUserDto;
     const isUserExist = await this.userRepository.findOneBy({ email });
-
     if (isUserExist) {
       throw new ConflictException('user is already exist');
     }
-
-    const salt = await bcrypt.genSalt(11);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const user = await this.userService.createUser(
-      Object.assign(createUserDto, { password: hashedPassword }),
-    );
-
+    const user = await this.userService.createUser(createUserDto);
     const payload: JwtPayload = { sub: user.id, userName: user.userName };
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_SECRET_KEY'),
