@@ -15,9 +15,11 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
+
   async getUsers(): Promise<User[]> {
     return this.userRepository.createQueryBuilder('user').getMany();
   }
+
   async getUserById(id: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
@@ -25,6 +27,7 @@ export class UserService {
     }
     return user;
   }
+
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { email } = createUserDto;
     const isUserExist = await this.userRepository.findOneBy({
